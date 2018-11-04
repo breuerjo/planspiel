@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ergebnis der Runde</title>
+    <script src="jquery/jquery-1.11.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>       	
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> <!-- Bibliothek für Diagramme -->
+ </head>
+ 
+<body>
+        <script type="text/javascript" >
+            $(document).ready(function() {
+                $('#footer').load('footer.html');
+                });
+
+            window.onload = function () {
+                jQuery.ajax({
+                url: "../api/spiel/zwischenstand",
+                type: "GET",
+                dataType: "json",
+                success: function(data, data2){                	
+                	rundeAnzeigen(data);                	
+                	printDiagramme(data);                 
+                }
+            });
+                
+                function printDiagramme(data){
+                	var unternehmenData = data.unternehmen;
+                    var marktanteilData = data.unternehmen.marktanteile;             
+                    var xWert = 1
+                   
+                    for(var index in unternehmenData){
+                       	dataPoints01.push({ label: unternehmenData[index].name, y: unternehmenData[index].gewinn, x: xWert});
+                        dataPoints03.push({ label: unternehmenData[index].name, y: unternehmenData[index].kapital, x: xWert});
+                        dataPoints04.push({ label: unternehmenData[index].name, y: unternehmenData[index].umsatz, x: xWert});
+                        dataPoints05.push({ label: unternehmenData[index].name, y: unternehmenData[index].mitarbeiter, x: xWert});
+                        
+                        dataPoints02.push({ indexLabel: unternehmenData[index].name, y: unternehmenData[index].marktanteile.Stuhl});
+                        dataPoints06.push({ indexLabel: unternehmenData[index].name, y: unternehmenData[index].marktanteile.Tisch});
+                        dataPoints07.push({ indexLabel: unternehmenData[index].name, y: unternehmenData[index].marktanteile.Schrank});
+                        
+                        xWert++;      
+                    }
+
+                  	chart01.options.data[0].dataPoints = dataPoints01; // Daten, die aus der JSON-Datei extrahiert wurden, den Diagrammen zuordnen
+                    chart03.options.data[0].dataPoints = dataPoints03;
+                    chart04.options.data[0].dataPoints = dataPoints04;
+                    chart05.options.data[0].dataPoints = dataPoints05;
+                    
+                    chart02.options.data[0].dataPoints = dataPoints02;
+                    chart06.options.data[0].dataPoints = dataPoints06;
+                    chart07.options.data[0].dataPoints = dataPoints07;
+                    
+                   
+                    chart01.render();
+                    chart03.render();
+                    chart04.render();
+                    chart05.render();  
+                    
+                    chart02.render();
+                    chart06.render();
+                    chart07.render(); 
+                }
+				
+                // In der Ueberschrift Rundenanzahl anzeigen
+                function rundeAnzeigen(data){
+                	var cont  = document.getElementById('runde');
+                    var rundeData =data.runde;
+                    var rundeDataInt = +rundeData -1; // Schnittstelle liefert die nächste Rundenanzahl, deswegen -1
+                    cont.innerHTML += rundeDataInt;
+                }
+
+               	var dataPoints01 = [];
+                var dataPoints02 = [];
+                var dataPoints03 = [];
+                var dataPoints04 = [];
+                var dataPoints05 = [];
+                var dataPoints06 = [];
+                var dataPoints07 = [];
+
+                // Diagramme generieren 
+                var chart01 = new CanvasJS.Chart("chartContainer01",
+                {
+                	animationEnabled: true, // Animation fuer das Diagramm
+            		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Gewinn in €"
+                    },      
+                    data: [
+                    {       
+                        type: "column",
+                        showInLegend: true,
+                        toolTipContent: "{y} €",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+                
+                 var chart04 = new CanvasJS.Chart("chartContainer04",
+                {
+                	animationEnabled: true, 
+             		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Umsatz in €"
+                    },      
+                    data: [
+                    {       
+                        type: "column",
+                        showInLegend: true,
+                        toolTipContent: "{y} €",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+                
+                var chart03 = new CanvasJS.Chart("chartContainer03",
+                {
+                	animationEnabled: true, 
+            		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Kapital in €"
+                    },      
+                     data: [
+                    {       
+                        type: "column",
+                        showInLegend: true,
+                        toolTipContent: "{y} €",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+                
+                 var chart02 = new CanvasJS.Chart("chartContainer02",
+                {
+                	 animationEnabled: true, 
+             		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Marktanteil der verkauften Stühle in %"
+                    },      
+                     data: [
+                    {       
+                        type: "pie",
+                        showInLegend: true,
+                        toolTipContent: "{y} %",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+
+                 var chart05 = new CanvasJS.Chart("chartContainer05",
+                {
+                	 animationEnabled: true, 
+             		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Mitarbeiter"
+                    },      
+                    data: [
+                    {       
+                        type: "column",
+                        showInLegend: true,
+                        toolTipContent: "{y} Mitarbeiter",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+
+                 var chart06 = new CanvasJS.Chart("chartContainer06",
+                {
+                	 animationEnabled: true, 
+             		animationDuration: 2000,
+                    theme: "theme2",
+                    title:{
+                        text: "Marktanteil der verkauften Tische in %"
+                    },      
+                    data: [
+                    {       
+                        type: "pie",
+                        showInLegend: true,
+                        toolTipContent: "{y} %",
+                        legendText: "{indexLabel}",
+                        dataPoints: [
+                        ]
+                    }
+                    ]
+                });
+                
+                var chart07 = new CanvasJS.Chart("chartContainer07",
+                        {
+		                	animationEnabled: true, 
+		            		animationDuration: 2000,
+                            theme: "theme2",
+                            title:{
+                                text: "Marktanteil der verkauften Schränke in %"
+                            },      
+                            data: [
+                            {       
+                                type: "pie",
+                                showInLegend: true,
+                                toolTipContent: "{y} %",
+                                legendText: "{indexLabel}",
+                                dataPoints: [
+                                ]
+                            }
+                            ]
+                        });                                              
+    }
+
+        </script>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="start.html">Unternehmensplanspiel</a>
+            </div>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="container"> 
+        <div class="page-header">
+            <h1 id="runde">Ergebnis Runde </h1>
+        </div>
+
+        <br>
+        <br>
+        <br>
+        
+        <div class="row">
+           <div class="col-sm-4 col-md-6">
+                 <div id="chartContainer01" style="height: 300px; width: 100%;"></div>
+            </div>
+            <div class="col-sm-4 col-md-6">
+               <div id="chartContainer04" style="height: 300px; width: 100%;"></div>
+            </div>             
+        </div>
+
+        <br>
+        <br>
+        <br>
+
+		<div class="row">
+            <div class="col-sm-4 col-md-6">
+                 <div id="chartContainer03" style="height: 300px; width: 100%;"></div>
+            </div>
+            <div class="col-sm-4 col-md-6">
+               <div id="chartContainer07" style="height: 300px; width: 100%;"></div>
+            </div>
+             
+        </div>
+        
+        <br>
+        <br>
+        <br>
+                
+        <div class="row">
+            <div class="col-sm-4 col-md-6">
+                 <div id="chartContainer02" style="height: 300px; width: 100%;"></div>
+            </div>
+            <div class="col-sm-4 col-md-6">
+               <div id="chartContainer06" style="height: 300px; width: 100%;"></div>
+            </div>
+             
+        </div> 
+        
+        <br>
+        <br>
+        <br>
+        
+        <div class="row">
+            <div class="col-sm-4 col-md-6">
+                 <div id="chartContainer05" style="height: 300px; width: 100%;"></div>
+            </div>             
+        </div> 
+        
+        <br>
+        <br>
+        <br>
+
+        <a class="btn btn-primary float-right" onclick="href='rundenresultat.html'">Nächste Runde starten</a>
+    </div>    
+            
+    <!-- Fixed footer -->
+    <div id="footer">
+    </div>
+        
+  </body>
+</html>

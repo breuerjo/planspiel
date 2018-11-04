@@ -1,0 +1,742 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beschaffung</title>
+   	<script src="jquery/jquery-1.11.0.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/bootstrap.min.js"></script>
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+
+ </head>
+ 
+ <body>
+ 		<script type="text/javascript" >
+ 		
+ 			$(document).ready(function() {
+                $('#navbar').load('navbar.html');
+                $('#footer').load('footer.html');
+                });
+ 			
+ 			var datenbMarkt;
+ 			var datenmMarkt;
+ 			var datenfMarkt;
+ 			var datenaMarkt;
+ 			var datenUnternehmen;
+ 	 		
+ 	 		var maschinenid;
+ 	 		var materialid;
+ 	 		var kreditid;
+ 	 		var mitarbeiterid;
+ 	 		
+ 			
+ 				
+ 				function getDataEinkauf(){
+	 				jQuery.ajax({
+	 					url: "../api/spiel/unternehmen",
+	 					type: "GET",
+	 					dataType: "json",
+	 					success: function(data, data2){
+	 						datenUnternehmen = data;
+	 						
+	 						console.log("datenUnternehmen funktioniert:"+datenUnternehmen.mitarbeiter.kapazitaeten.VERWALTUNG);
+	 						datenbMarkt=data.bmarkt.angebote;
+	 						datenmMarkt=data.mmarkt.angebote;
+	 						
+	 						printMaterial(datenbMarkt);
+	 						printMaschinen(datenmMarkt);
+	 					}
+	 				});
+	 				
+	 				jQuery.ajax({
+	 					url: "../api/spiel/fmarkt",
+	 					type: "GET",
+	 					dataType: "json",
+	 					success: function(data, data2){
+	 						datenfMarkt=data.angebote;
+	 						printKredite(datenfMarkt);
+	 					}
+	 				});
+	 				
+	 				jQuery.ajax({
+	 					url: "../api/spiel/amarkt",
+	 					type: "GET",
+	 					dataType: "json",
+	 					success: function(data, data2){
+	 						datenaMarkt = data.angebote;
+	 						printMitarbeiter(datenaMarkt);
+	 					}
+	 				});
+ 				}
+ 				
+ 				window.onload = getDataEinkauf();
+ 				
+ 			// Alle Bilder der Materialien
+ 			var imgMat = {};
+ 			imgMat[ "Holz" ] = "img/holz.jpg";
+ 			imgMat[ "Stoff" ] = "img/stoff.jpg";
+ 			imgMat[ "Leder" ] = "img/leder.jpg";
+ 			imgMat[ "Glas" ] = "img/glas.jpg";
+ 			imgMat[ "Kunststoff" ] = "img/plastik.jpg";
+ 			imgMat[ "Edelstahl" ] = "img/edelstahl.jpg";
+ 			
+ 			// Alle Bilder der Maschinen
+ 			var imgMas = {};
+ 			imgMas[ "Holzstuhlmaschine" ] = "img/maschineeins.jpg";
+ 			imgMas[ "Stoffstuhlmaschine" ] = "img/maschineeins.jpg";
+ 			imgMas[ "Lederstuhlmaschine" ] = "img/maschineeins.jpg";
+ 			
+ 			imgMas[ "Holztischmaschine" ] = "img/maschinezwei.jpg";
+ 			imgMas[ "Glastischmaschine" ] = "img/maschinezwei.jpg";
+ 			imgMas[ "Kunststofftischmaschine" ] = "img/maschinezwei.jpg";
+ 			
+ 			imgMas[ "Holzschrankmaschine" ] = "img/maschinedrei.jpg";
+ 			imgMas[ "Edelstahlschrankmaschine" ] = "img/maschinedrei.jpg";
+ 			imgMas[ "Glasschrankmaschine" ] = "img/maschinedrei.jpg";
+ 			
+ 			
+ 			/* 
+ 			 * function printMaterial()
+ 			 * */
+ 			function printMaterial(data){
+ 				var cont  = document.getElementById('contentMaterial');
+ 				var s ="";
+ 			    var index = 0;
+ 			    
+ 				for(var angebot in data){
+ 					materialid = data[angebot].markteinheit.id;
+ 					var inputid = "inputEinkauf"+materialid;
+ 					//var outputid = "demo"+materialid;
+ 					var value = imgMat[ data[angebot].markteinheit.name];
+		 			
+ 					s += '<div class="col-sm-6 col-md-4"><div class="thumbnail">'+
+ 							'<img src="' + value +'" alt="' + data[angebot].markteinheit.name + '">' + 
+ 							'<div class="caption">'+
+ 								'<div class="col-sm-12">'+
+ 									'<h3>'+ data[angebot].markteinheit.name+'</h3>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>Preis pro ME</p>'+
+ 								'</div>';
+ 					
+ 						var preis = data[angebot].preis;
+ 						preis = preis.toFixed(2);
+ 						
+ 							s+='<div class="col-sm-6">'+
+ 									'<p>'+ preis+'&nbsp;&nbsp;€</p>'+
+ 								'</div>'+
+ 											
+ 								'<div class="col-sm-6">'+
+ 									'<p>Verfügbar</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].menge+'&nbsp;&nbsp;ME</p>'+
+ 									'<br>'+
+ 								'</div>'+		
+ 																
+ 		        				'<div class="col-sm-3">'+
+ 									'<input class="form-control input-sm" type="text" id ='+ inputid+'>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-3">'+
+ 									'<p>Stück</p>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-4">'+
+ 									'<a href="#" class="btn btn-danger" onClick = "kaufeModal('+materialid+','+angebot+',1)" data-toggle="modal" data-target="#modalKaufen">Kaufen</a>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								
+ 								//'<div class="col-sm-12">'+
+ 								//'<p id='+outputid+'>Test</p>'+
+ 								//'</div>' +
+ 							'</div>' + 
+ 							'</div></div></div>';
+ 							index++;
+ 				}
+ 				cont.innerHTML = s;
+ 			}
+ 			
+ 			
+ 			/* 
+ 			 * function printMaschinen()
+ 			 * */
+ 			function printMaschinen(data){
+ 				
+ 				var cont  = document.getElementById('contentMaschine');
+ 				var s ="";
+ 			    var index = 0;
+ 			    
+ 				for(var angebot in data){
+ 					
+ 					maschinenid = data[angebot].markteinheit.id;
+ 					var inputid = "inputEinkauf"+maschinenid;
+ 					//var outputid = "demo"+maschinenid;
+ 					
+ 					var value = imgMas[ data[angebot].markteinheit.name];
+ 					
+ 					s += '<div class="col-sm-6 col-md-4"><div class="thumbnail">'+
+ 						'<img src="' + value +'" alt="' + data[angebot].markteinheit.name + '">' + 
+ 							'<div class="caption">'+
+ 								'<div class="col-sm-12">'+
+ 									'<h3>'+ data[angebot].markteinheit.name+'</h3>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>Preis</p>'+
+ 								'</div>';
+ 								
+ 								var preis = data[angebot].preis;
+ 		 						preis = preis.toFixed(2);
+ 		 						
+ 							s+=	'<div class="col-sm-6">'+
+ 									'<p>'+ preis+'&nbsp;&nbsp;€</p>'+
+ 								'</div>'+
+ 											
+ 								'<div class="col-sm-6">'+
+ 									'<p>Verfügbar</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].menge+'&nbsp;&nbsp;St.</p>'+
+ 								'</div>'+
+ 								
+ 								'<div class="col-sm-6">'+
+ 								'<p>Kapazität</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].markteinheit.kapazitaet+'&nbsp;&nbsp;St.</p>'+
+ 									'<br>'+
+ 								'</div>'+	
+ 																
+ 		        				'<div class="col-sm-3">'+
+ 									'<input class="form-control input-sm" type="text" id ='+ inputid+'>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-3">'+
+ 									'<p>Stück</p>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-4">'+
+ 									'<a href="#" class="btn btn-danger"  onClick = "kaufeModal('+maschinenid+','+angebot+', 2)" data-toggle="modal" data-target="#modalKaufen">Kaufen</a>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								//'<div class="col-sm-12">'+
+ 								//'<p id='+outputid+'>Test</p>'+
+ 								//'</div>' +
+ 							'</div>' + 
+ 							'</div></div></div>';
+ 							
+ 							index++;
+ 				}
+ 				cont.innerHTML = s;
+ 			}
+ 			
+
+ 			/* 
+ 			 * function printKredite()
+ 			 * */
+ 			function printKredite(data){
+ 				
+ 				var cont  = document.getElementById('contentKredite');
+ 				var s ="";
+ 			    
+ 				for(var angebot in data){
+ 					
+ 					kreditid = data[angebot].markteinheit.id;
+ 					var inputid = "inputEinkauf"+kreditid;
+ 					//var outputid = "demo"+kreditid;
+ 					
+ 					s += '<div class="col-sm-6 col-md-4"><div class="thumbnail">'+
+ 						
+ 							'<div class="caption">'+
+ 								'<div class="col-sm-12">'+
+ 									'<h3>'+ data[angebot].markteinheit.name+'</h3>'+
+ 								'</div>'+
+ 								/* '<div class="col-sm-6">'+
+ 									'<p>Preis in €</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].preis+' €</p>'+
+ 								'</div>'+ */
+ 											
+ 								'<div class="col-sm-6">'+
+ 									'<p>Verfügbar</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].menge+'</p>'+
+ 									'<br>'+
+ 								'</div>';
+ 								
+ 							var vStunden = Math.trunc(data[angebot].markteinheit.verwaltungsZeit / 60);
+ 							var vMinuten = data[angebot].markteinheit.verwaltungsZeit % 60;
+ 								
+ 							s+= '<div class="col-sm-6">'+
+									'<p>Benötigte Verwaltungszeit</p>'+
+								'</div>'+
+								'<div class="col-sm-6">'+
+									'<p>'+vStunden+' Std. '+vMinuten+' Min. </p>'+
+									'<br>'+
+									'<br>'+
+								'</div>'+
+ 								
+ 								'<div class="col-sm-6">'+
+ 								'<p>Laufzeit</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].markteinheit.laufzeit+' Quartale</p>'+
+ 								'</div>'+	
+ 								'<div class="col-sm-6">'+
+ 								'<p>Volumen</p>'+
+ 								'</div>'+
+ 								'<div class="col-sm-6">'+
+ 									'<p>'+ data[angebot].markteinheit.volumen+' €</p>'+
+ 								'</div>'+	
+ 								'<div class="col-sm-6">'+
+ 								'<p>Zinssatz</p>'+
+ 								'</div>';
+ 							
+ 							var zinssatz = data[angebot].markteinheit.zinssatz * 100;
+ 								
+ 							s+=	'<div class="col-sm-6">'+
+ 									'<p>'+ zinssatz+' %</p>'+
+ 									'<br>'+
+ 								'</div>'+	
+ 															
+ 		        				'<div class="col-sm-3">'+
+ 									'<input class="form-control input-sm" type="text" id ='+ inputid+'>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-3">'+
+ 									'<p>Stück</p>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								'<div class="col-sm-4">'+
+ 									'<a href="#" class="btn btn-danger"  onClick = "kaufeModal('+kreditid+','+angebot+', 3)" data-toggle="modal" data-target="#modalKaufen">Kaufen</a>'+
+ 									'<br>'+
+ 								'</div>'+
+ 								//'<div class="col-sm-12">'+
+ 								//'<p id='+outputid+'>Test</p>'+
+ 								//'</div>' +
+ 							'</div>' + 
+ 							'</div></div></div>';
+ 				}
+ 				cont.innerHTML = s;
+ 			}
+ 			
+ 			
+ 			/* 
+ 			 * function printMitarbeiter()
+ 			 * */
+ 			function printMitarbeiter(data){
+ 				var cont  = document.getElementById('contentMitarbeiter');
+ 				var s ="";
+ 				
+				for(var angebot in data){
+					
+					mitarbeiterid = data[angebot].markteinheit.id;
+ 					var inputid = "inputEinkauf"+mitarbeiterid;
+ 					
+ 					s += '<div class="col-sm-6 col-md-4"><div class="thumbnail">'+
+		 					'<div class="caption">'+
+							'<div class="col-sm-12">'+
+								'<h3>'+ data[angebot].markteinheit.name+'</h3>'+
+							'</div>'+
+							'<div class="col-sm-6">'+
+							'<p>Fachgebiet</p>'+
+							'</div>';
+							
+					// Setze das Mitarbeiter-Fachgebiet
+					var mfg;
+					if(data[angebot].markteinheit.mfg == "MASCHINE"){
+						mfg = "Maschine";
+					}
+					if(data[angebot].markteinheit.mfg == "VERWALTUNG"){
+						mfg = "Verwaltung";
+					}
+					if(data[angebot].markteinheit.mfg == "VERTRIEB"){
+						mfg = "Vertrieb";
+					}
+					
+					s+=		'<div class="col-sm-6">'+
+							'<p>'+ mfg+'</p>'+
+							'</div>'+
+							'<div class="col-sm-6">'+
+								'<p>Einstellungskosten</p>'+
+							'</div>';
+							
+							var preis = data[angebot].preis;
+	 						preis = preis.toFixed(2);
+	 						
+						s+=	'<div class="col-sm-6">'+
+								'<p>'+ preis+' €</p>'+
+							'</div>'+
+							'<div class="col-sm-6">'+
+								'<p>Verfügbar</p>'+
+							'</div>'+
+							'<div class="col-sm-6">'+
+								'<p>'+ data[angebot].menge+'</p>'+
+								'<br>'+
+							'</div>';
+						
+						// Math.trunc gibt den ganzzahligen Teil einer Zahl zurück
+						var aStunden = Math.trunc(data[angebot].markteinheit.arbeitszeit / 60);
+						var aMinuten = data[angebot].markteinheit.arbeitszeit % 60;
+						s+=	'<div class="col-sm-6">'+
+							'<p>Arbeitszeit</p>'+
+							'</div>'+
+							'<div class="col-sm-6">'+
+							'<p>'+aStunden+' Std. '+aMinuten+' Min. </p>'+
+							'</div>'+	
+							
+							'<div class="col-sm-6">'+
+							'<p>Lohnkosten</p>'+
+							'</div>';
+							
+							var lohnkosten = data[angebot].markteinheit.lohnkosten;
+	 						lohnkosten = lohnkosten.toFixed(2);
+							
+						s+=	'<div class="col-sm-6">'+
+							'<p>'+lohnkosten+' €</p>'+
+							'<br>'+
+							'</div>'+
+							
+							'<div class="col-sm-3">'+
+								'<input class="form-control input-sm" type="text" id ='+ inputid+'>'+
+								'<br>'+
+							'</div>'+
+							'<div class="col-sm-3">'+
+								'<p>Arbeiter</p>'+
+								'<br>'+
+							'</div>'+
+							'<div class="col-sm-4">'+
+								'<a href="#" class="btn btn-danger"  onClick = "kaufeModal('+mitarbeiterid+','+angebot+', 4)" data-toggle="modal" data-target="#modalKaufen">Einstellen</a>'+
+								'<br>'+
+							'</div>'+
+							
+							'</div>'+
+	 					'</div></div>';
+						
+				}
+				cont.innerHTML = s;
+ 			}
+
+
+ 			
+ 			/* 
+ 			 * function kaufeModal()
+ 			 * */
+ 			function kaufeModal(id, angebot, markt) {
+ 				var fMarkt;
+ 				// Wert des Input-Feldes auslesen(Menge, die gekauft werden soll)
+ 				var iV = document.getElementById("inputEinkauf"+id).value;
+ 			
+ 				//Entscheidung, auf welchem Beschaffungsmarkt wir uns befinden
+ 				if(markt == 1) {
+ 					markt = datenbMarkt;
+ 					fMarkt = false;
+ 				}
+ 				if(markt == 2) {
+ 					markt = datenmMarkt;
+ 					fMarkt = false;
+ 				}
+ 				if(markt == 3) {
+ 					markt = datenfMarkt;
+ 					fMarkt = true;
+ 				} 
+				if(markt == 4) {
+ 					markt = datenaMarkt;
+ 					fMarkt = false;
+ 				} 
+ 				
+ 				var text;
+ 				// Verfügbare Menge
+ 				var menge = markt[angebot].menge;
+ 				
+ 				// Prüfe, ob Eingabe die verfügbare Menge überschreitet oder ein negativer Wert eingegeben wird
+ 				if (isNaN(iV) || iV < 1 || iV > menge) {
+ 					var cont  = document.getElementById('contentModal');
+ 			        text = "<h3>&nbsp;&nbsp;Eingabe ungültig!</h3>";
+ 			        cont.innerHTML = text;
+ 			        return;
+ 			    } else {
+ 			        text = iV;
+ 			    }
+ 				
+ 				//Test: Input-Wert
+ 				//document.getElementById("demo"+id).innerHTML = text;
+ 				
+ 			    
+ 			    // Material, Maschinen und Mitarbeiter erhalten die selbe Nachricht
+ 			    if(fMarkt == false){
+ 			    
+	 				//Inhalt des Modal
+	 				var cont  = document.getElementById('contentModal');
+	 				var s ="";
+	 				
+	 				//Multipliziere Preis mit eingebener Menge
+	 				var kosten = markt[angebot].preis;
+	 				kosten *= iV;
+	 				kosten = kosten.toFixed(2);
+	 				
+	 				var angebotsid = markt[angebot].id;
+	 				
+	 				s += '<div class="col-sm-12">'+
+							'<h3>Kauf von ' +  markt[angebot].markteinheit.name +':</h3><div><br></div>'+
+						'</div>'+
+						'<div class="col-sm-12">'+
+							'<h4>Menge:&nbsp;&nbsp;'+ iV+'&nbsp;Stück</h4>'+
+						'</div>'+
+						'<div class="col-sm-12">'+
+						'<h4>Kosten:&nbsp;&nbsp;'+ kosten+'&nbsp;Euro</h4>'+
+						'</div>'+
+						'<div class="row">'+
+							'<div class="col-sm-9">'+
+							'</div>'+
+							'<div class="col-sm-3">'+
+								'<button type="button" class="btn btn-danger" data-dismiss="modal" onClick="kaufe('+iV+', '+angebotsid+')">Bestätigen</button>'+
+							'</div>'+
+						'</div>';
+	 			
+	 					cont.innerHTML = s;
+	 					
+	 			// Für den Kauf von Krediten, muss geprüft werden, ob ein Mitarbeiter der Verwaltung zur Verfügung steht
+ 			    } else {
+ 			    	//Inhalt des Modal
+	 				var cont  = document.getElementById('contentModal');
+	 				var s ="";
+	 				
+	 				//Multipliziere Preis mit eingebener Menge
+	 				var kosten = markt[angebot].preis;
+	 				kosten *= iV;
+	 				
+	 				// Gibt mir die benötigte und die vorhandene Verwaltungszeit
+	 				var bVerwaltungszeit = markt[angebot].markteinheit.verwaltungsZeit * iV;
+	 				var vVerwaltungszeit = datenUnternehmen.mitarbeiter.kapazitaeten.VERWALTUNG;
+	 				//vVerwaltungszeit *= 1;
+	 				console.log(vVerwaltungszeit);
+	 				
+	 				
+	 				var angebotsid = markt[angebot].id;
+	 				
+	 				
+	 				s += '<div class="col-sm-12">'+
+							'<h3>Kauf von ' +  markt[angebot].markteinheit.name +':</h3><div><br></div>'+
+						'</div>'+
+						
+						
+						'<div class="col-sm-6">'+
+						'<h4>Menge:</h4>'+
+						'</div>'+
+						'<div class="col-sm-6">'+
+						'<h4>'+ iV +' Stück</h4>'+
+						'</div>';
+						
+						/* '<div class="col-sm-6">'+
+						'<h4>Kosten:</h4>'+
+						'</div>'+
+						'<div class="col-sm-6">'+
+						'<h4>'+ kosten +' Euro</h4>'+
+						'</div>'+ */
+						
+					var vStunden = Math.trunc(bVerwaltungszeit / 60);
+					var vMinuten = bVerwaltungszeit % 60;
+					
+					s+=	'<div class="col-sm-6">'+
+						'<h4>Benötigte Verwaltungszeit:</h4>'+
+						'</div>'+
+						'<div class="col-sm-6">'+
+						'<h4>'+vStunden+' Std. '+vMinuten+' Min.</h4>'+
+						'</div>';
+						
+						// Falls genug Verwaltungszeit vorhanden
+						if(vVerwaltungszeit >= bVerwaltungszeit){
+							s+='<div class="row">'+
+								'<div class="col-sm-9">'+
+								'</div>'+
+								'<div class="col-sm-3">'+
+									'<button type="button" class="btn btn-danger" data-dismiss="modal" onClick="kaufe('+iV+', '+angebotsid+')">Bestätigen</button>'+
+								'</div>'+
+							'</div>';
+						
+						// Falls NICHT genug Verwaltungszeit vorhanden
+						} else{
+							
+							var vStunden = Math.trunc(vVerwaltungszeit / 60);
+							var vMinuten = vVerwaltungszeit % 60;
+							
+							s+='<div class="row">'+
+								'<br>'+
+								'<div class="col-sm-6">'+
+								'</div>'+
+								'<div class="col-sm-6">'+
+								'<h5>Nicht genug Verwaltungszeit vorhanden!</h5>'+
+								'<h5>Aktuell vorhandene Verwaltungszeit: '+vStunden+' Std. '+vMinuten+' Min.</h5><div><br></div>'+
+								'</div>'+
+							'</div>';
+						}
+						
+	 					cont.innerHTML = s;
+ 			    }
+ 			}
+ 		
+ 			
+ 			/* 
+ 			 * function kaufe()
+ 			 * */
+ 			function kaufe(menge, id){
+ 				console.log("Menge: "+menge);
+ 				jQuery.ajax({
+ 			 		url: "../api/spiel/angebotkaufen?menge=" + menge + "&angebotsid=" + id,
+ 			 		type: "GET",
+ 			 		dataType: "json",
+ 			 		sucess: function() {
+ 			 			console.log("Success");
+ 				    }
+ 		 		});
+ 				
+ 				$('#navbar').load('navbar.html');
+ 				getDataEinkauf();
+ 			}
+
+		</script>
+
+    <!-- Fixed navbar -->
+    <div id="navbar">
+	</div>
+    
+	<!-- Page Header -->
+	<div class="container">
+	
+        <div class="page-header">
+            <h1>Beschaffung</h1>
+            <!-- Sprungmarke für Navigation -->
+  			<div id="materialien"></div>
+            <br>
+        </div>
+        
+        
+      
+        <div class="page-header">
+            <h2>Materialien</h2>
+        </div>
+        
+        <div class="well">
+        		<div class="row" id="contentMaterial">
+  				</div>
+  		</div>
+  		
+  		<!-- Sprungmarke für Navigation -->
+  		<div id="maschinen"></div>
+  		<br>
+  		<br>
+  		
+  		 <div class="page-header" >
+            <h2>Maschinen</h2>
+        </div>
+        
+        <div class="well">
+        		<div class="row" id="contentMaschine">
+  				</div>
+  		</div>
+  		
+  		
+  		<!-- Sprungmarke für Navigation -->
+  		<div id="mitarbeiter"></div>
+  		<br>
+  		<br>
+  		
+  		 <div class="page-header">
+            <h2>Mitarbeiter</h2>
+        </div>
+        
+        <div class="well">
+        		<div class="row" id="contentMitarbeiter">
+  				</div>
+  		</div>
+  		
+  		<!-- Sprungmarke für Navigation -->
+  		<div id="kredite"></div>
+  		<br>
+  		<br>
+  		
+  		 <div class="page-header">
+            <h2>Kredite</h2>
+        </div>
+        
+        <div class="well">
+        		<div class="row" id="contentKredite">
+  				</div>
+  		</div>
+		
+		<br>
+	</div>	
+
+	<!-- The Modal -->
+  <div class="modal" id="modalKaufen">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+         <div class="modal-body" id="contentModal">
+          </div>
+       
+        
+      </div>
+    </div>
+  </div>
+    
+   
+    <!-- Fixed footer -->
+    <div id="footer">
+	</div>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <div class="modal fade" id="contact" role="dialog">
+    	<div class="modal-dialog">
+    		<div class="modal-content">
+    			<form class="form-horizontal" role="form">
+    				<div class="modal-header">
+    					<h4>Contact<h4>
+	    			</div>
+	    			<div class="modal-body">
+    					<div class="form-group">
+    						<label for="contact-name" class="col-sm-2 control-label">Name</label>
+    						<div class="col-sm-10">
+    							<input type="text" class="form-control" id="contact-name" placeholder="First & Last Name">
+    						</div>
+    					</div>
+    					<div class="form-group">
+    						<label for="contact-email" class="col-sm-2 control-label">Email</label>
+    						<div class="col-sm-10">
+    							<input type="email" class="form-control" id="contact-email" placeholder="example@domain.com">
+    						</div>
+    					</div>
+    					<div class="form-group">
+    						<label for="contact-message" class="col-sm-2 control-label">Message</label>
+    						<div class="col-sm-10">
+    							<textarea class="form-control" rows="4"></textarea>
+    						</div>
+    					</div>
+	    			</div>
+	    			<div class="modal-footer">
+    					<a class="btn btn-default" data-dismiss="modal">Close</a>
+    					<button type="submit" class="btn btn-primary">Send</button>
+    				</div>
+    			</form>
+    		</div>
+    	</div>
+    </div>
+    
+
+  </body>
+</html>

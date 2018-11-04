@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marketing</title>
+    <script src="jquery/jquery-1.11.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+
+ </head>
+ 
+ <body>
+    <script>
+      $(document).ready(function() {
+                $('#navbar').load('navbar.html');
+                getDataMarketing();
+                $('#footer').load('footer.html');
+                });
+
+    </script>
+
+	<script>
+	// Funktion, um bereits durchgeführte Marketingmaßnahmen aufzurufen
+    function getDataMarketing(){
+      jQuery.ajax({
+        url: "../api/spiel/marketingmix",
+        type: "GET",
+        dataType: "json",
+        success: function(data, data2){
+          printDataMarketing(data.marketing);
+          
+        }
+      });
+    }
+    
+ 	// Funktion, um bereits durchgeführte Marketingmaßnahmen auszugeben
+    function printDataMarketing(data){
+      var cont  = document.getElementById('marketingContent');
+      var s ="";
+      var index = 0;
+
+      for(var angebot in data){
+    	  
+     s +='<div class="col-sm-6 col-md-4">' + 
+          '<div class="thumbnail">' + 
+            '<div class="caption">' + 
+              '<h3 class="cardTop">' + data[angebot].art+ '</h3>' +
+              '</div>'+
+				'<div class="col-sm-6">'+
+				'<p>Name: </p>'+
+			'</div>'+
+			'<div class="col-sm-6">'+
+				'<p>'+ data[angebot].name+'</p>'+
+          '</div>' +
+          
+				'<div class="col-sm-6">'+
+					'<p>Budget: </p>'+
+				'</div>'+
+				'<div class="col-sm-6">'+
+					'<p>'+ data[angebot].budget+'</p>'+
+              '</div>' +
+           '</div>' +
+        '</div>';
+
+            index++;
+      }
+      
+      if(index == 0){
+    	  s = "<h4 style='padding-left: 18px'>Zur Zeit keine Marketingmaßnahmen vorhanden!</h4>";
+      }
+      cont.innerHTML = s;
+    }
+    </script>
+ 
+    <!-- Fixed navbar -->
+    <div id="navbar">
+  </div>
+
+  <style>
+    .panelTop{
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    .cardTop{
+      margin-top: 2px;
+    }
+  </style>
+    
+	
+	<div class="container">	
+		<!-- Page Header -->
+	    <div class="page-header">
+	      <h1>Marketing</h1>
+	    </div>
+	    
+	    <div class="well">
+			<div class="row" id="marketingContent">
+	    	</div>
+	    </div>
+	</div>
+   
+    <!-- Fixed footer -->
+    <div id="footer">
+    </div>
+
+  </body>
+</html>

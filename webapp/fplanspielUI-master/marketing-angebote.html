@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marketing</title>
+    <script src="jquery/jquery-1.11.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+ </head>
+ 
+ <body>
+ 		<script>
+ 			$(document).ready(function() {
+                $('#navbar').load('navbar.html');
+                $('#footer').load('footer.html');
+                });
+		</script>
+
+    <!-- Fixed navbar -->
+    <div id="navbar">
+	</div>
+    
+	<div class="container">	
+			<!-- Page Header -->
+        <div class="page-header">
+            <h1>Marketing</h1>
+        </div>
+		
+		<div>
+			<h3>Auswahl einer geeigneten Marketing-Strategie</h3>
+		</div>
+		
+		<div class="well">
+        		<div class="row" id="contentMarketing">
+  				</div>
+  		</div>
+              
+    <script type="text/javascript">
+    
+    var datenMarketing;
+    var kapazitätVerwaltung;
+    var maximalesBudget = 0;
+   	var kapitalAktuell = 0;
+    
+    window.onload = getDataMarketing();
+
+    // Funktion, um mit Hilfe von Ajax Daten aus JSON-Datei aufrufen
+    function getDataMarketing(){
+			jQuery.ajax({
+				url: "../api/spiel/marketingangebote",
+				type: "GET",
+				dataType: "json",
+				success: function(data, data2){
+					datenMarketing=data;
+					printMarketing(datenMarketing);
+				}
+			});
+			
+			// Kapazität der Verwaltungsmitarbeiter
+			jQuery.ajax({
+					url: "../api/spiel/unternehmen",
+					type: "GET",
+					dataType: "json",
+					success: function(data, data2){
+						kapitalAktuell = data.kapital;
+						kapazitätVerwaltung = data.mitarbeiter.kapazitaeten.VERWALTUNG;
+						window.maximalesBudget = parseInt(kapazitätVerwaltung / 0.2);
+						
+						if (kapitalAktuell < maximalesBudget) window.maximalesBudget = kapitalAktuell;
+						
+						for (i=0;i<=5;i++){
+							var anzeigeKapazität = document.getElementById('anzeigeKapazität'+i);
+							var string ="";
+							
+							string = '<p>'+kapazitätVerwaltung+'</p>';
+							
+							document.getElementById('anzeigeKapazität'+i).innerHTML = string;
+							
+							if (maximalesBudget == 0) {
+								document.getElementById('maximalesBudget'+i).innerHTML = "Verwaltungsmitarbeiter fehlen! ";
+							} else {
+								document.getElementById('maximalesBudget'+i).innerHTML = "Du kannst maximal " + maximalesBudget + " € investieren. ";
+							}
+							
+						}
+					}
+				});
+    }
+	
+    // Funktion, um Marketingdaten auszugeben
+    function printMarketing(data){
+			
+				var cont  = document.getElementById('contentMarketing');
+				var s ="";
+				var marketingMaßnahme;
+				
+				for(var angebot in data){
+					marketingMaßnahme = data[angebot];
+					
+					s += '<div class="col-sm-6 col-md-4"><div class="thumbnail">'+
+						
+							'<div class="caption">'+
+								'<div class="col-sm-12">'+
+									'<h3>'+ data[angebot]+'</h3>'+
+								'</div>'+
+								'<div class="col-sm-12">'+							
+									'<p>Diese Kampagne verbessert deine Verkaufschancen.</p>'+
+								'</div>'+
+								'<br></br>'+
+							
+								'<div class="col-sm-12">'+
+									'<label>Vorhandene Arbeitszeit Verwaltung: </label>' +							
+								'</div>'+
+								'<div class="col-sm-12">'+
+						'<p id="anzeigeKapazität'+angebot+'">  </p>' +
+						'</div>'+
+						
+						'<div class="col-sm-12">'+
+						'<label id="maximalesBudget'+angebot+'">Du kannst maximal € investieren <br> </label>' +
+						
+					'</div>'+
+					'<div class="col-sm-12">'+
+					'<label>  </label>' +					
+				'</div>'+						
+						'<div class="col-sm-12">'+
+						'<p>Wie viel Geld möchtest Du investieren?</p>'+
+						'</div>'+
+								'<br></br>'+
+		        				'<div class="col-sm-3">'+
+									'<input class="form-control input-sm" type="text" id =inputid'+ angebot+'>'+
+									'<br>'+
+								'</div>'+
+								'<div class="col-sm-3">'+
+									'<p>Euro </p>'+
+									'<br>'+
+								'</div>'+
+								'<div class="col-sm-4">'+
+									'<a href="#" class="btn btn-danger"  onClick = "marketingModal('+angebot+')" data-toggle="modal" data-target="#modalKaufen">Buchen</a>'+
+									'<br>'+
+								'</div>'+
+							'</div>' + 
+							'</div></div></div>';
+							
+							
+				}
+				cont.innerHTML = s;
+			}   
+		
+		// Funktion, die bei einem Klick auf Button "Buchen" aufgerufen wird
+			function marketingModal(marketingID) {
+			
+				var budget = document.getElementById("inputid" +marketingID).value;
+			 	var cont  = document.getElementById('contentModal');
+				var s ="";
+								
+				if (isNaN(budget) || budget < 1 || budget > maximalesBudget) { 
+ 			        text = "<h3>&nbsp;&nbsp;Eingabe ungültig!</h3>";
+ 			        cont.innerHTML = text;
+ 			        return;
+				} else {  
+					s += 
+						'<div class="col-sm-12">'+
+				'<h3>Bestätigung für ' +  datenMarketing[marketingID] +':</h3><div><br></div>'+
+				'</div>'+
+				'<div class="col-sm-12">'+
+				'<h4>Budget: '+ budget+' Euro</h4>'+			
+				'</div>'+	
+				'<div class="col-sm-6">'+
+				'<h4>Name für Marketingmaßnahme: </h4>'+
+				'</div>'+
+				'<div class="col-sm-6">'+
+				'<input class="form-control input-sm" type="text" id="nameMarketing">'+
+				'</div>'+	
+				'<div class="row">'+
+					'<div class="col-sm-9">'+
+					'</div>'+
+					'<div class="col-sm-3">'+
+						'<button id="marketingBestaetigen" type="button" class="btn btn-danger"  onClick="marketingDurchführen('+marketingID+','+budget+')">Bestätigen</button>'+
+					'</div>'+
+				'</div>'+
+				
+				
+				'<div class="col-sm-12">'+
+					'<label id="fehlermeldung"></label>'+
+					'<label ></label>'+
+			'</div>';
+
+					cont.innerHTML = s; 					
+				}		
+			}
+		
+			// Funktion, die bei einem Klick auf Button "Bestätigen" aufgerufen wird
+			function marketingDurchführen(marketingID, budget){
+				var art = datenMarketing[marketingID];
+				var name = document.getElementById("nameMarketing").value;
+
+				var trimName = name.trim();
+				
+				// Falls ungültiger Name für Marketingmaßnahme, dann Fehlermeldung anzeigen; falls nicht, dann Schnittstelle aufrufen & Daten übergeben
+				if (trimName == ""){
+					document.getElementById("fehlermeldung").innerHTML = "Bitte einen Namen für Marketingmaßnahme auswählen!";
+					$('#modalKaufen').modal('show');					
+				} else {
+					jQuery.ajax({
+	 			 		url: "../api/spiel/buchenmarketingmaßnahme?art=" + art + "&budget=" + budget + "&name=" + name,
+	 			 		type: "GET",
+	 			 		dataType: "json",
+	 			 		sucess: function() {
+	 			 			console.log("Success");
+	 			 			location.reload(true);
+	 				    }
+	 		 		});					
+					$('#modalKaufen').modal('hide'); // Modal schließen
+	 				$('#navbar').load('navbar.html'); // Navbar aktualisieren
+	 				getDataMarketing(); // Marketing-Daten aktualisieren
+				}	
+ 			}
+			
+			 function setColourRed(element){
+		        	element.style.color = "#FF0000";
+		     }
+    </script>
+	</div>
+	
+	<!-- Modal -->
+	  <div class="modal" id="modalKaufen">
+	    <div class="modal-dialog">
+	      <div class="modal-content">
+	      
+	        <!-- Modal Header -->
+	        <div class="modal-header">
+	          <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        </div>       
+	         <div class="modal-body" id="contentModal">
+	          </div> 
+	      </div>
+	    </div>
+	  </div>
+
+    <!-- Fixed footer -->
+    <div id="footer">
+	</div>
+        
+  </body>
+</html>
