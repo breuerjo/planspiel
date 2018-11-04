@@ -1,6 +1,6 @@
 Fachkonzept:
 - Fachkonzept-Klassen: ./java/fachkonzept
-- DTO (Data Transfer Objects): ./java/dto
+- DTO (Data Transfer Object - Klassen): ./java/dto
 
 Rest-Service: ./service
 
